@@ -1,0 +1,8 @@
+DEPENDENCIES
+  main
+    path: site-cookbooks/main
+
+GRAPH
+  apt (2.9.2)
+  main (0.1.0)
+    apt (~> 2.9.2)

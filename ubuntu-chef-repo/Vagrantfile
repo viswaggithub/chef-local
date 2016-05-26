@@ -1,0 +1,55 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://atlas.hashicorp.com/search.
+  #
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    config.proxy.http     = "http://corppac.walgreens.com:8080"
+    config.proxy.https    = "http://corppac.walgreens.com:8080"
+    config.proxy.no_proxy = "localhost,127.0.0.1,.example.com"
+  end
+
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.box_url = "~/Downloads/trusty-server-cloudimg-amd64-vagrant-disk1.box"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
+  #
+  config.vm.provider "virtualbox" do |vb|
+    # For a complete reference, please see the online documentation at
+    # https://docs.vagrantup.com/v2/virtualbox/configuration.html
+
+    # Name used in Oracle VM VirtualBox Manager GUI
+    vb.name = "berkshelf-ubuntu-kitchen"
+
+    # Customize the amount of memory on the VM (in MB):
+    vb.memory = "2048"
+
+    # Customize the amount of video memory on the VM (in MB):
+    vb.customize ["modifyvm", :id, "--vram", "128"]
+  end
+
+  # Install the latest version of Chef.
+  # For more information see https://github.com/chef/vagrant-omnibus
+  #
+  config.omnibus.chef_version = :latest
+
+  # Enabling the Berkshelf plugin.
+  config.berkshelf.enabled = true
+
+  # Provision with Chef Zero
+  #
+  config.vm.provision :chef_zero do |chef|
+    # Specify the local paths where Chef data is stored
+    chef.cookbooks_path = [ 'cookbooks', 'site-cookbooks' ]
+    chef.data_bags_path = "data_bags"
+    chef.nodes_path = "nodes"
+    chef.roles_path = "roles"
+
+    # Add a recipe
+    chef.add_recipe "main::default"
+  end
+end
